@@ -1,0 +1,19 @@
+# Arquivos compilados
+*.class
+
+# Pastas de build
+bin/
+build/
+out/
+
+# Eclipse
+.settings/
+.project
+.classpath
+
+# Logs
+*.log
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
