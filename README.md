@@ -1,317 +1,337 @@
-# Estudos de Java – Fundamentos da Linguagem e POO
+# ☕ Programação Orientada a Objetos — Resumo Java
 
-Este repositório reúne **anotações** e **exercícios** desenvolvidos durante meus estudos de Java e Programação Orientada a Objetos (POO). O objetivo é consolidar os conceitos fundamentais da linguagem e criar uma base sólida para evoluir em desenvolvimento de software.
-
----
-
-## 1️⃣ Introdução ao Java e Ambiente de Desenvolvimento
-
-Java é uma linguagem de programação orientada a objetos, amplamente utilizada no desenvolvimento de sistemas web, aplicações corporativas, aplicativos Android e outros tipos de software.
-
-Uma das principais características do Java é ser **multiplataforma** – um programa escrito em Java pode rodar em diferentes sistemas operacionais como **Windows**, **Linux** e **macOS** graças à sua arquitetura.
-
-### 🔹 Processo de execução de um programa Java
-
-O fluxo de execução de um programa Java é:
-
-1. O código fonte é escrito em um arquivo `.java`.
-2. O compilador converte esse código em Bytecode (`.class`).
-3. Esse Bytecode é interpretado pela **JVM** (Java Virtual Machine).
-
-```
-Código Java (.java)
-        ↓
-Compilação (javac)
-        ↓
-Bytecode (.class)
-        ↓
-JVM interpreta e executa
-```
-
-Princípio:  
-**Write Once, Run Anywhere**  
-(*Escreva uma vez, execute em qualquer lugar*)
-
-### 🔹 Componentes do ambiente Java
-
-- **JVM (Java Virtual Machine)**
-  - Interpreta e executa o Bytecode.
-  - Gerencia memória e garante portabilidade.
-- **JRE (Java Runtime Environment)**
-  - Ambiente necessário para executar aplicações Java.
-  - Contém a JVM, bibliotecas padrão e recursos essenciais.
-- **JDK (Java Development Kit)**
-  - Kit de desenvolvimento para programadores.
-  - Inclui o JRE, compilador (`javac`) e ferramentas.
-
-> **JDK = JRE + Ferramentas de desenvolvimento**
+> **Disciplina:** Programação Orientada a Objetos 
 
 ---
 
-## 2️⃣ Lógica de Programação Básica em Java
+## 🧱 Estrutura do Java
 
-Antes de trabalhar com POO, é preciso dominar a lógica básica.
+### JVM, JRE e JDK
 
-Principais conceitos:
-- Criação do primeiro programa
-- Variáveis
-- Entrada e saída de dados
-- Estruturas condicionais
+```
+JDK (Java Development Kit)
+└── JRE (Java Runtime Environment)
+    ├── JVM (Java Virtual Machine)
+    └── Bibliotecas
+```
 
-### 🔹 Primeiro programa em Java
+- **JVM** — executa o Byte Code em qualquer sistema operacional
+- **JRE** — necessário para *rodar* programas Java
+- **JDK** — necessário para *desenvolver* programas Java
+
+O código `.java` é compilado pelo `javac` → gera `.class` (Byte Code) → executado pela JVM no Windows, Linux ou Mac.
+
+---
+
+## 🔤 Sintaxe Básica
+
+### Primeiro Programa
 
 ```java
-public class Main {
+public class Program {
     public static void main(String[] args) {
-        System.out.println("Olá mundo");
+        System.out.println("Olá mundo!"); // com quebra de linha
+        System.out.print("Sem quebra");   // sem quebra de linha
     }
 }
 ```
-| Elemento             | Função                     |
-|----------------------|---------------------------|
-| `class`              | Define uma classe          |
-| `main`               | Método principal           |
-| `System.out.println` | Imprime na tela            |
 
-### 🔹 Tipos de variáveis
-
-| Tipo    | Uso                           |
-|---------|-------------------------------|
-| int     | números inteiros              |
-| float   | números decimais (simples)    |
-| double  | números decimais (precisão)   |
-| char    | caractere                     |
-| boolean | verdadeiro ou falso           |
-| String  | texto                         |
+### Tipos de Dados e Variáveis
 
 ```java
-int idade = 20;
-double salario = 2500.50;
-char letra = 'A';
-String nome = "Vinicius";
+int    idade  = 18;
+char   letra  = 'r';
+double real   = 123.4;
+float  pi     = 3.14f;
+String texto  = "Olá";
+
+// Constante (não pode ser alterada)
+final float PI = 3.14159265f;
 ```
 
-### 🔹 Entrada de dados com Scanner
+### Atalhos Úteis no Eclipse
+
+| Atalho | Ação |
+|--------|------|
+| `sysout` + `Ctrl+Espaço` | Gera `System.out.println()` |
+| `Alt+Shift+R` | Renomeia variável em todo o código |
+| `Ctrl+D` | Deleta a linha atual |
+| `Ctrl+/` | Comenta/descomenta linha |
+| `Ctrl+Shift+F` | Formata o código |
+
+---
+
+## ⌨️ Leitura pelo Teclado (Scanner)
 
 ```java
 import java.util.Scanner;
 
-Scanner teclado = new Scanner(System.in);
-System.out.println("Digite seu nome:");
-String nome = teclado.nextLine();
+Scanner sc = new Scanner(System.in);
+
+int    numInt  = sc.nextInt();       // lê inteiro
+double numReal = sc.nextDouble();    // lê decimal
+float  numF    = sc.nextFloat();     // lê float
+String palavra = sc.next();          // lê uma palavra
+String linha   = sc.nextLine();      // lê linha completa
+char   c       = sc.next().charAt(0); // lê um caractere
+
+sc.close(); // sempre fechar ao final
 ```
-
-### 🔹 Estruturas condicionais
-
-- **If / Else**
-    ```java
-    if (idade >= 18) {
-        System.out.println("Maior de idade");
-    } else {
-        System.out.println("Menor de idade");
-    }
-    ```
-- **Switch Case**
-    ```java
-    switch(opcao) {
-        case 1:
-            System.out.println("Opção 1");
-            break;
-        case 2:
-            System.out.println("Opção 2");
-            break;
-    }
-    ```
 
 ---
 
-## 3️⃣ Estruturas de Repetição
+## 🔀 Condicionais
 
-Permitem executar um bloco de código várias vezes:
+### if / else
 
-### 🔹 For
+```java
+if (idade >= 18) {
+    System.out.println("Maior de idade!");
+} else {
+    System.out.println("Menor de idade!");
+}
+```
+
+### Switch Case
+
+```java
+switch (numero) {
+    case 1:
+        System.out.println("Um");
+        break;
+    case 2:
+        System.out.println("Dois");
+        break;
+    default:
+        System.out.println("Outro");
+}
+```
+
+---
+
+## 🔁 Laços de Repetição
+
+### for — quando se sabe o número de iterações
 
 ```java
 for (int i = 0; i < 5; i++) {
+    System.out.println(i); // imprime 0, 1, 2, 3, 4
+}
+```
+
+### while — quando se sabe a condição de parada
+
+```java
+int i = 0;
+while (i < 5) {
     System.out.println(i);
-}
-```
-- Inicialização
-- Condição
-- Incremento
-
-### 🔹 While
-
-```java
-while (numero < 10) {
-    System.out.println(numero);
-    numero++;
+    i++;
 }
 ```
 
-### 🔹 Do While
+### do...while — executa pelo menos uma vez
 
 ```java
+int i = 0;
 do {
-    System.out.println(numero);
-    numero++;
-} while (numero < 10);
+    System.out.println(i);
+    i++;
+} while (i < 5);
 ```
+
+> 💡 **Diferença principal:** no `do...while`, o bloco é executado **antes** de verificar a condição.
 
 ---
 
-## 4️⃣ Vetores e Matrizes
+## 📦 Vetores (Arrays)
 
-### 🔹 Vetores (Arrays)
+Coleção **unidimensional** de elementos do mesmo tipo. Índice começa em **0**.
 
 ```java
+// Declaração e atribuição manual
 int[] numeros = new int[5];
 numeros[0] = 10;
 numeros[1] = 20;
-```
-- Os índices começam em 0.
+// ...
 
-### 🔹 Matrizes
+// Percorrendo com for
+for (int i = 0; i < numeros.length; i++) {
+    System.out.println("Índice " + i + " = " + numeros[i]);
+}
+```
+
+### Leitura de vetor pelo teclado
+
+```java
+int[] numeros = new int[5];
+Scanner sc = new Scanner(System.in);
+
+for (int i = 0; i < numeros.length; i++) {
+    System.out.println("Digite o elemento " + i + ":");
+    numeros[i] = sc.nextInt();
+}
+```
+
+---
+
+## 🔢 Matrizes
+
+Coleção **bidimensional** — acessada por dois índices `[linha][coluna]`.
+
+```java
+// Declaração
+int[][] matriz = new int[3][3];
+
+// Atribuição
+matriz[0][0] = 1; matriz[0][1] = 2; matriz[0][2] = 3;
+// ...
+
+// Percorrendo com for aninhado
+for (int i = 0; i < matriz.length; i++) {
+    for (int j = 0; j < matriz[i].length; j++) {
+        System.out.print(matriz[i][j] + " ");
+    }
+    System.out.println(); // quebra de linha por linha da matriz
+}
+```
+
+### Leitura de matriz pelo teclado
 
 ```java
 int[][] matriz = new int[3][3];
-```
-- Representação: `[linha][coluna]`
+Scanner sc = new Scanner(System.in);
 
----
-
-## 5️⃣ Fundamentos da Programação Orientada a Objetos (POO)
-
-A POO organiza o código em torno de **objetos** que representam entidades do mundo real: Carro, Pessoa, Computador, Conta bancária...
-
-### 🔹 Classe
-
-Um **molde** com atributos (características) e métodos (comportamentos):
-
-```java
-public class Carro {
-    String marca;
-    String modelo;
-    int ano;
+for (int i = 0; i < matriz.length; i++) {
+    for (int j = 0; j < matriz[i].length; j++) {
+        System.out.println("Digite o elemento [" + i + "][" + j + "]:");
+        matriz[i][j] = sc.nextInt();
+    }
 }
 ```
 
-### 🔹 Objeto
-
-Uma **instância** de uma classe:
-
-```java
-Carro carro1 = new Carro();
-// carro1 é um objeto da classe Carro
-```
-
-### 🔹 Encapsulamento
-
-Protege os dados da classe com modificadores de acesso:
-
-| Modificador | Acesso                                         |
-|-------------|------------------------------------------------|
-| public      | qualquer lugar                                 |
-| private     | apenas dentro da classe                        |
-| protected   | dentro do pacote ou subclasses                 |
+---
 
 ---
 
-## 6️⃣ Anatomia de uma Classe
+## 🧩 Orientação a Objetos — Conceitos Fundamentais
 
-Uma classe típica possui:
+### Terminologia
 
-1️⃣ Atributos  
-2️⃣ Construtores  
-3️⃣ Métodos
+| Conceito | Definição | Equivalente Estruturado |
+|---------|-----------|------------------------|
+| **Classe** | Molde/estrutura que descreve um conjunto de objetos | — |
+| **Objeto** | Instância de uma classe | — |
+| **Atributo** | Característica do objeto (estado) | Variável |
+| **Método** | Funcionalidade do objeto (comportamento) | Função |
+| **Subclasse** | Classe filha que herda atributos e métodos da classe mãe | — |
+
+> **Exemplo:** A classe `Carro` define atributos como modelo, cor, ano. O objeto `Gol` é uma instância dessa classe. De uma mesma classe podem existir múltiplos objetos: `Celta`, `Corsa`, `Civic`, `Meriva`.
+
+---
+
+### Encapsulamento
+
+É o empacotamento de atributos e métodos dentro de uma classe, com controle de acesso:
+
+| Símbolo UML | Palavra-chave Java | Acesso |
+|-------------|-------------------|--------|
+| `+` Público | `public` | Qualquer classe |
+| `-` Privado | `private` | Apenas a própria classe |
+| `#` Protegido | `protected` | Classe e subclasses |
+
+> 💡 **Boa prática:** atributos devem ser `private`; o acesso externo se dá via métodos getters/setters.
+
+---
+
+### Conceitos futuros da disciplina
+
+- **Herança** — subclasse herda atributos e métodos da classe mãe
+- **Mensagem** — troca de informação entre objetos
+- **Associação** — utilização de recursos entre objetos
+- **Abstração** — classe não instanciável
+- **Polimorfismo** — métodos com muitas formas (sobrecarga e sobrescrita)
+
+> A modelagem de classes segue o padrão **UML** (Unified Modeling Language): [uml.org](http://www.uml.org)
+
+---
+
+## 🏗️ Classes e Objetos em Java
+
+### Criando uma Classe
 
 ```java
+// Arquivo: Pessoa.java
 public class Pessoa {
-    // atributos
-    String nome;
-    int idade;
+    public String nome;   // atributo público
+    public int idade;     // atributo público
+}
+```
 
-    // construtor
-    public Pessoa(String nome, int idade) {
-        this.nome = nome;
-        this.idade = idade;
+> ⚠️ O nome da classe **deve** ser igual ao nome do arquivo `.java`. Uma classe sem `main` não é executável sozinha — ela é apenas o "molde".
+
+### Instanciando (criando) objetos
+
+```java
+// Arquivo: Principal.java
+public class Principal {
+    public static void main(String[] args) {
+        Pessoa p1 = new Pessoa();   // instancia o objeto p1
+        p1.nome = "João";
+        p1.idade = 20;
+
+        Pessoa p2 = new Pessoa();   // instancia o objeto p2
+        p2.nome = "Maria";
+        p2.idade = 22;
+
+        System.out.println("Nome: " + p1.nome + " | Idade: " + p1.idade);
+        System.out.println("Nome: " + p2.nome + " | Idade: " + p2.idade);
     }
+}
+```
 
-    // método
-    public void mostrarDados() {
-        System.out.println(nome);
-        System.out.println(idade);
+### Leitura de objetos pelo teclado
+
+```java
+Scanner sc = new Scanner(System.in);
+
+Pessoa p1 = new Pessoa();
+System.out.println("Digite o nome:");
+p1.nome = sc.next();
+System.out.println("Digite a idade:");
+p1.idade = sc.nextInt();
+```
+
+### Usando múltiplas classes no mesmo projeto
+
+```java
+// Professor.java
+public class Professor {
+    public String nome;
+}
+
+// Laboratorio.java
+public class Laboratorio {
+    public String local;
+}
+
+// Disciplina.java (executável)
+public class Disciplina {
+    public static void main(String[] args) {
+        Professor p = new Professor();
+        p.nome = "Ricardo da Silva";
+
+        Laboratorio lab = new Laboratorio();
+        lab.local = "Sala 108";
+
+        System.out.println("Professor: " + p.nome);
+        System.out.println("Local: " + lab.local);
     }
 }
 ```
 
----
+## 📝 Paradigmas de Programação (Contexto)
 
-## 7️⃣ Construtores
-
-Método especial para inicialização de objetos.
-
-- Mesmo nome da classe
-- Sem tipo de retorno
-- Executado ao usar `new`
-
-```java
-public Pessoa(String nome, int idade) {
-    this.nome = nome;
-    this.idade = idade;
-}
-
-// Criando objeto
-Pessoa p1 = new Pessoa("Vinicius", 20);
-```
-
----
-
-## 8️⃣ Sobrecarga de Construtores
-
-Vários construtores com parâmetros diferentes:
-
-```java
-public Pessoa(String nome) {
-}
-
-public Pessoa(String nome, int idade) {
-}
-```
-
----
-
-## 9️⃣ Palavra-chave this
-
-Referencia o próprio objeto.
-```java
-public Pessoa(String nome){
-    this.nome = nome;
-}
-```
-| Variável    | Significado          |
-|-------------|---------------------|
-| this.nome   | atributo da classe  |
-| nome        | parâmetro do método |
-
----
-
-## 🔟 Métodos
-
-Ações que o objeto realiza:
-
-```java
-public void acelerar() {
-    System.out.println("O carro está acelerando");
-}
-
-carro.acelerar(); // Chamando o método
-```
-
----
-
-## 📌 Conclusão
-
-O estudo de Java começa com os conceitos fundamentais de lógica de programação e evolui para o paradigma de Programação Orientada a Objetos, formando a base essencial para qualquer desenvolvedor de software.
-
----
+- **Imperativas → Procedurais:** C, COBOL, Pascal
+- **Imperativas → Orientada a Objetos:** Java, C++, Python, C#  ← *estamos aqui*
+- **Declarativas → Funcionais:** Erlang, R
+- **Declarativas → Lógicas:** Prolog, LISP
