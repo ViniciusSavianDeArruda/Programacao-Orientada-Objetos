@@ -624,6 +624,354 @@ public class Gerente extends Funcionario {
 
 ---
 
+## 🔄 Override (Sobrescrita de Métodos)
+
+Quando uma subclasse herda um método da superclasse, ela pode **reescrever** esse método para ter um comportamento especializado. Isso é o **override** — o método da subclasse substitui o da superclasse para aquele tipo de objeto.
+
+### Como funciona
+
+```java
+// Superclasse
+public class Animal {
+    public void emitirSom() {
+        System.out.println("Som genérico de animal...");
+    }
+}
+
+// Subclasse
+public class Cachorro extends Animal {
+
+    @Override
+    public void emitirSom() {
+        System.out.println("Au au!"); // comportamento especializado
+    }
+}
+
+// Uso
+Animal a = new Animal();
+a.emitirSom();   // → "Som genérico de animal..."
+
+Cachorro c = new Cachorro();
+c.emitirSom();   // → "Au au!"
+```
+
+### A anotação `@Override`
+
+É colocada antes do método sobrescrito. É opcional, mas altamente recomendada pois:
+
+- Avisa o compilador que a intenção é sobrescrever um método da superclasse
+- Se o nome do método estiver errado, o **compilador avisa** em vez de criar um método novo silenciosamente
+
+### Regras do Override
+
+| Regra | Detalhe |
+|-------|---------|
+| **Nome** | Deve ser idêntico ao da superclasse |
+| **Parâmetros** | Devem ser os mesmos |
+| **Retorno** | Deve ser o mesmo (ou compatível) |
+| **Acesso** | Não pode ser mais restritivo que o original |
+
+### Usando `super` junto com Override
+
+É possível sobrescrever **e ainda aproveitar** o comportamento original da superclasse usando `super.nomeDoMetodo()`:
+
+```java
+public class Gerente extends Funcionario {
+
+    @Override
+    public void apresentar() {
+        super.apresentar();  // executa o método da superclasse primeiro
+        System.out.println("E sou o gerente do setor!");
+    }
+}
+```
+
+### Override vs Sobrecarga (Overload)
+
+| | **Override** | **Sobrecarga (Overload)** |
+|---|---|---|
+| Onde? | Entre classes (herança) | Na mesma classe |
+| Nome | Mesmo | Mesmo |
+| Parâmetros | **Mesmos** | **Diferentes** |
+| Objetivo | Especializar comportamento | Dar opções de uso |
+
+> 💡 **Dica:** a sobrecarga já foi vista na seção de Construtores — o mesmo conceito se aplica a métodos comuns. O override é exclusivo da herança.
+
+---
+
+## ⚠️ Principais Exceções em Java
+
+Em Java, uma **exceção** é um evento anômalo que interrompe o fluxo normal de execução. O sistema de exceções é uma infraestrutura arquitetural — não apenas uma convenção sintática — projetada para separar a lógica de negócio da lógica de recuperação de falhas.
+
+### Taxonomia: A Hierarquia de Throwable
+
+```
+java.lang.Throwable
+├── java.lang.Error                  ← Não tratável (falhas críticas da JVM)
+└── java.lang.Exception              ← Tratável
+    ├── RuntimeException  [Unchecked]
+    │   ├── NullPointerException
+    │   ├── ArrayIndexOutOfBoundsException
+    │   ├── ArithmeticException
+    │   ├── ClassCastException
+    │   └── IllegalArgumentException
+    └── IOException, SQLException... [Checked]
+```
+
+| Nível | Classe | Descrição |
+|-------|--------|-----------|
+| Topo | `Throwable` | Raiz de toda a hierarquia |
+| Irrecuperável | `Error` | Falhas críticas da JVM — nunca capturar |
+| Recuperável | `Exception` | Cenários dos quais o programa pode se recuperar |
+| Falha de lógica | `RuntimeException` | Erros de programação — subclasse de Exception |
+
+### Checked vs. Unchecked — O Contrato Arquitetural
+
+| Dimensão | Checked | Unchecked |
+|----------|---------|-----------|
+| **Herança Base** | Estendem `Exception` (exceto `RuntimeException`) | Estendem `RuntimeException` |
+| **Verificação do Compilador** | Obrigatória — exige `try-catch` ou `throws` | Opcional — compilador não obriga o tratamento |
+| **Natureza da Falha** | Fatores externos imprevistos (rede, arquivo) | Erros lógicos de programação |
+| **Ação Recomendada** | Recuperação ativa ou mitigação do erro | Correção do código-fonte (bug-fix) |
+| **Exemplos** | `IOException`, `SQLException` | `NullPointerException`, `ArithmeticException` |
+
+### Exceções Unchecked (Erros de Lógica)
+
+#### `NullPointerException`
+Ocorre quando a JVM tenta acessar um método ou atributo em uma referência que aponta para `null`.
+
+```java
+String texto = null;
+int tamanho = texto.length(); // Dispara NullPointerException
+```
+
+Quando ocorre: invocar métodos em variável nula, acessar atributo de objeto nulo, acessar índice em array não inicializado.
+
+#### `IndexOutOfBoundsException`
+Indica que um índice de alguma estrutura ordenável (Array, String, List) está fora dos limites válidos.
+
+Gatilhos: acesso a posições negativas, acesso a índices maiores ou iguais ao tamanho real, falha na condição de parada de laços `for`/`while`.
+
+#### `ArithmeticException`
+Lançada quando ocorre uma condição matemática impossível durante o processamento.
+
+```java
+int a = 10;
+int b = 0;
+System.out.println(a / b); // Lança ArithmeticException: / by zero
+```
+
+#### `IllegalArgumentException`
+Exceção lançada proativamente para indicar que um método recebeu um argumento com valor inapropriado ou logicamente inválido. Padrão **Fail-Fast** — interrompe a execução antes de processar dados corrompidos.
+
+```java
+throw new IllegalArgumentException("Idade inválida");
+```
+
+#### `IllegalStateException`
+Sinaliza que um método foi invocado num momento ilegal — o objeto não está no estado correto para processar a operação.
+
+Quando utilizar: tentar iniciar uma `Thread` que já está rodando, iterar sobre uma coleção já fechada, proteger regras de negócio que dependem de sequência de eventos (Estado A → B → C).
+
+### Exceções Checked (Contingências Externas)
+
+#### `IOException`
+Sinaliza falha ou interrupção nas operações de Entrada/Saída. O erro reside no ambiente externo, não na lógica do programa. **Exige** bloco `try-catch` ou declaração `throws`.
+
+Gatilhos: leitura de arquivo inexistente (`FileNotFoundException`), falha em fluxos de rede (sockets), interrupção em permissões de disco.
+
+#### `SQLException`
+Lançada para erros no acesso a banco de dados ou problemas correlatos a transações relacionais.
+
+Gatilhos: perda de conexão com o SGBD, sintaxe SQL malformada, violação de restrições relacionais (chave estrangeira, chave primária duplicada).
+
+### Exceções Customizadas
+
+É possível criar classes próprias para mapear regras de negócio específicas, aumentando a legibilidade do sistema:
+
+```java
+// Caminho Checked — força o chamador a tratar
+class SaldoInsuficienteException extends Exception {
+    public SaldoInsuficienteException(String mensagem) {
+        super(mensagem);
+    }
+}
+
+// Caminho Unchecked — chamador não é obrigado a capturar
+class IdadeInvalidaException extends RuntimeException {
+    public IdadeInvalidaException(String mensagem) {
+        super(mensagem);
+    }
+}
+```
+
+Para usar: instanciar e disparar com `throw new`:
+
+```java
+public void sacar(double valor) {
+    if (valor > this.saldo) {
+        throw new SaldoInsuficienteException("Saldo inferior ao saque requisitado.");
+    }
+}
+```
+
+### Cheat Sheet: Matriz de Síntese
+
+| Exceção | Categoria | Significado Resumido | Escopo da Causa |
+|---------|-----------|---------------------|-----------------|
+| `NullPointerException` | Unchecked | Referência nula de memória | Lógica/Desenvolvedor |
+| `IndexOutOfBoundsException` | Unchecked | Violação de limites de Array/Lista | Lógica/Desenvolvedor |
+| `ArithmeticException` | Unchecked | Falha matemática (ex: Div/0) | Lógica/Desenvolvedor |
+| `IllegalArgumentException` | Unchecked | Parâmetro de método inválido | Validação de Contrato |
+| `IllegalStateException` | Unchecked | Estado de vida do objeto corrompido | Controle de Fluxo/Objeto |
+| `IOException` | Checked | Interrupção em leitura/escrita | Ambiente/Arquivo/Rede |
+| `SQLException` | Checked | Falha transacional em BD | Infraestrutura/Banco |
+| Custom Exceptions | Depende | Violação de regra de negócios | Arquitetura de Domínio |
+
+---
+
+## 🛡️ Tratamento de Exceções em Java
+
+O tratamento de exceções é uma **infraestrutura arquitetural** projetada para separar a lógica de negócio da lógica de recuperação de falhas, garantindo a integridade do estado da aplicação diante de anomalias.
+
+### A Árvore Taxonômica de Throwable
+
+```
+Throwable  ← O topo da hierarquia
+├── Error          ← Falhas irrecuperáveis (OutOfMemoryError, StackOverflowError)
+└── Exception      ← Contingências recuperáveis
+    └── RuntimeException  ← Falhas de programação (Unchecked)
+```
+
+> ⚠️ Instâncias de `Error` representam falhas críticas no nível da JVM. A aplicação **não deve** tentar capturá-las (`catch`), pois a recuperação do estado é tecnicamente inviável.
+
+### O Fluxo try-catch
+
+O bloco `try` delimita o escopo monitorado. Se uma falha ocorre, a execução daquele escopo é abortada instantaneamente. A JVM busca o primeiro bloco `catch` cujo parâmetro corresponda (ou seja superclasse) do objeto de exceção gerado. O modelo do Java é de **terminação** — não retorna ao ponto original da falha.
+
+```java
+try {
+    // código que pode lançar exceção
+    int resultado = 10 / 0;
+} catch (ArithmeticException e) {
+    // tratamento da exceção capturada
+    System.out.println("Erro: " + e.getMessage());
+}
+```
+
+### O bloco `finally`
+
+A cláusula `finally` garante uma finalização **determinística**. Independentemente de o `try` concluir com sucesso, de uma exceção ser capturada pelo `catch`, ou até de um `catch` lançar uma nova exceção, o fluxo **obrigatoriamente** passará pelo `finally` antes de prosseguir.
+
+Primordialmente utilizado para limpeza e liberação de recursos (fechamento de conexões, arquivos e sockets).
+
+```java
+try {
+    // lógica de negócio
+} catch (IOException e) {
+    // tratamento
+} finally {
+    // executado SEMPRE — sucesso ou falha
+    recurso.close();
+}
+```
+
+### `throw` vs. `throws` — A Ação vs. O Contrato
+
+| | `throw` | `throws` |
+|---|---------|---------|
+| **O quê** | A execução da falha — sinaliza explicitamente uma condição anômala | O aviso de risco — declara as exceções que um método pode disparar |
+| **Escopo** | Dentro do corpo do método | Na assinatura do método |
+
+```java
+// throw — dentro do corpo
+throw new IllegalArgumentException("Valor nulo");
+
+// throws — na assinatura
+public void lerArquivo() throws IOException {
+    ...
+}
+```
+
+### Desempilhamento e Delegação (Stack Unwinding)
+
+Quando uma exceção não é capturada no escopo em que ocorre, o Java realiza o **desempilhamento** (stack unwinding): o método atual é encerrado, suas variáveis locais são destruídas, e a exceção é passada para o método chamador. A delegação continua até encontrar um bloco `catch` compatível ou até derrubar a Thread principal.
+
+```
+Main → Method A → Method B
+                    ↑ IOException lançada aqui
+               ← Exception propagada de volta →
+Main (captura aqui ou programa termina)
+```
+
+### Gestão de Recursos: try-with-resources (Java 7+)
+
+A estrutura `try-with-resources` automatiza o fechamento determinístico de recursos. Qualquer objeto que implemente `java.lang.AutoCloseable` (ou `Closeable`) terá seu `.close()` invocado automaticamente pela JVM ao final do escopo, eliminando a necessidade do `finally` manual.
+
+```java
+// ❌ Pré-Java 7 — verboso e arriscado
+try {
+    recurso = abrirRecurso();
+    // lógica
+} catch (Exception e) {
+    // tratamento
+} finally {
+    if (recurso != null) {
+        recurso.close(); // falha aqui pode ocultar exceção original!
+    }
+}
+
+// ✅ Java 7+ — limpo e seguro
+try (Scanner leitor = new Scanner(arquivo)) {
+    // lógica — leitor.close() é chamado automaticamente
+} catch (IOException e) {
+    // tratamento
+}
+```
+
+**Vantagens do `try-with-resources`:**
+
+| Dimensão | Clássico (Pré-Java 7) | Moderno (Java 7+) |
+|----------|----------------------|-------------------|
+| Gestão | Manual no `finally` | Automática pela JVM |
+| Ordem de Fechamento | Aleatória (depende do dev) | Inversa à ordem de declaração |
+| Boilerplate | Elevado (aninhamentos nulos) | Mínimo (integrado ao `try`) |
+| Mascaramento de Erros | A última exceção no `finally` sobrepõe o erro original | A falha original é preservada; falhas secundárias são suprimidas |
+
+### Modelagem de Regras de Negócio (Exceções Customizadas)
+
+É uma boa prática mapear falhas de regras de negócio em classes específicas de exceção. Para criar uma exceção customizada, cria-se uma classe que herde de `Exception` (para checked) ou de `RuntimeException` (para unchecked):
+
+```java
+// Checked — força o chamador a tratar
+public class SaldoInsuficienteException extends Exception {
+    public SaldoInsuficienteException() {
+        super();
+    }
+    public SaldoInsuficienteException(String message) {
+        super(message);
+    }
+}
+```
+
+### Síntese Arquitetural: O Cenário Ideal
+
+```java
+public void processarDados() throws OperacaoFalhouException {        // Contrato de Delegação
+    try (Scanner leitor = new Scanner(arquivo)) {                    // Gestão Moderna de Recursos
+        if (!valido) {
+            throw new RegraNegocioException();                       // Ação Explícita de Domínio
+        }
+    } catch (IOException | SQLException e) {                        // Multi-catch de Contingências
+        throw new OperacaoFalhouException("Falha na leitura", e);   // Encapsulamento (Translation)
+    }
+}
+```
+
+> 💡 A resiliência não significa evitar falhas, mas construir uma infraestrutura onde, mesmo diante do inevitável, o software falhe de forma **controlada, recuperável e documentada**.
+
+---
+
 ## 📝 Paradigmas de Programação (Contexto)
 
 - **Imperativas → Procedurais:** C, COBOL, Pascal
