@@ -303,6 +303,174 @@ public class Disciplina {
 
 ---
 
+## ⚡ Membros Estáticos (`static`)
+
+A palavra-chave `static` indica que um membro **pertence à classe**, e não a uma instância específica. Isso significa que ele existe independentemente de qualquer objeto criado — não é necessário usar `new` para acessá-lo.
+
+> 💡 É exatamente o que o `main` é: `public static void main` — o Java o chama diretamente na classe, sem criar nenhum objeto.
+
+### Atributo Estático
+
+Um atributo `static` é **compartilhado entre todos os objetos** da classe. Há uma única cópia na memória, independentemente de quantas instâncias existam.
+
+```java
+public class Contador {
+    public static int total = 0; // pertence à classe, não ao objeto
+
+    public Contador() {
+        total++; // toda instância incrementa o mesmo contador
+    }
+}
+
+// Uso
+Contador c1 = new Contador();
+Contador c2 = new Contador();
+Contador c3 = new Contador();
+
+System.out.println(Contador.total); // → 3
+```
+
+> ⚠️ Atributos estáticos são acessados via `NomeClasse.atributo`, não via referência de objeto. Acessar por objeto (`c1.total`) funciona, mas é considerado má prática pois esconde que o dado é compartilhado.
+
+### Método Estático
+
+Um método `static` pode ser chamado diretamente pela classe, **sem instanciar nenhum objeto**. É amplamente utilizado para funções utilitárias e auxiliares.
+
+```java
+public class Calculadora {
+    public static int somar(int a, int b) {
+        return a + b;
+    }
+
+    public static double media(double[] valores) {
+        double soma = 0;
+        for (double v : valores) soma += v;
+        return soma / valores.length;
+    }
+}
+
+// Uso — sem new, diretamente pela classe
+int resultado = Calculadora.somar(3, 5);       // → 8
+double m = Calculadora.media(new double[]{4, 6, 8}); // → 6.0
+```
+
+### Constante Estática (`static final`)
+
+A combinação `static final` define uma **constante de classe** — um valor imutável compartilhado globalmente. Por convenção, o nome é escrito em `MAIÚSCULAS_COM_UNDERLINE`.
+
+```java
+public class Matematica {
+    public static final double PI      = 3.14159265;
+    public static final double EULER   = 2.71828182;
+}
+
+// Uso
+System.out.println(Matematica.PI);    // → 3.14159265
+System.out.println(Matematica.EULER); // → 2.71828182
+```
+
+### Bloco de Inicialização Estático
+
+Executado **uma única vez**, no momento em que a classe é carregada pela JVM. Útil para inicializar atributos estáticos com lógica mais complexa.
+
+```java
+public class Configuracao {
+    public static final String AMBIENTE;
+
+    static {
+        // bloco executado uma vez quando a classe é carregada
+        String env = System.getenv("APP_ENV");
+        AMBIENTE = (env != null) ? env : "desenvolvimento";
+        System.out.println("Classe carregada. Ambiente: " + AMBIENTE);
+    }
+}
+```
+
+### Regras e Restrições do `static`
+
+| O que membros `static` **podem** fazer | O que membros `static` **não podem** fazer |
+|----------------------------------------|--------------------------------------------|
+| Acessar outros membros `static` da classe | Usar a palavra-chave `this` |
+| Ser chamados via `NomeClasse.membro()` | Acessar atributos de instância diretamente |
+| Existir sem nenhum objeto criado | Ser sobrescritos com `@Override` (podem ser ocultados, não sobrescritos) |
+| Ser `public`, `private` ou `protected` | Chamar métodos de instância sem uma referência de objeto |
+
+```java
+public class Exemplo {
+    private int valorInstancia = 10;      // atributo de instância
+    private static int valorEstatico = 20; // atributo estático
+
+    public static void metodoEstatico() {
+        System.out.println(valorEstatico);  // ✅ acessa membro estático
+        // System.out.println(valorInstancia); // ❌ ERRO de compilação
+        // System.out.println(this.valorInstancia); // ❌ ERRO: 'this' não existe aqui
+    }
+
+    public void metodoInstancia() {
+        System.out.println(valorInstancia);  // ✅ acessa membro de instância
+        System.out.println(valorEstatico);   // ✅ também pode acessar estático
+    }
+}
+```
+
+### Instância vs. Estático — Comparativo
+
+| Dimensão | Membro de Instância | Membro Estático (`static`) |
+|----------|:-------------------:|:--------------------------:|
+| Pertence a | Cada objeto individualmente | À classe como um todo |
+| Requer `new` para existir | ✅ Sim | ❌ Não |
+| Acesso | `objeto.membro` | `Classe.membro` |
+| Cópias na memória | Uma por objeto criado | Uma única, compartilhada |
+| Pode usar `this` | ✅ Sim | ❌ Não |
+| Uso típico | Estado e comportamento do objeto | Utilitários, contadores, constantes |
+
+### Exemplo Completo: Controle de Instâncias
+
+```java
+public class Produto {
+    // Atributo estático — compartilhado: conta todos os produtos criados
+    private static int totalProdutos = 0;
+
+    // Atributos de instância — cada produto tem os seus
+    private String nome;
+    private double preco;
+
+    public Produto(String nome, double preco) {
+        this.nome  = nome;
+        this.preco = preco;
+        totalProdutos++; // incrementa o contador global a cada new
+    }
+
+    // Método estático — não depende de nenhum objeto específico
+    public static int getTotalProdutos() {
+        return totalProdutos;
+    }
+
+    // Método de instância — depende dos dados do objeto
+    public void exibir() {
+        System.out.println(nome + " — R$ " + preco);
+    }
+}
+
+// Programa principal
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(Produto.getTotalProdutos()); // → 0
+
+        Produto p1 = new Produto("Caneta", 2.50);
+        Produto p2 = new Produto("Caderno", 15.90);
+        Produto p3 = new Produto("Mochila", 89.99);
+
+        p1.exibir(); // → Caneta — R$ 2.5
+        p2.exibir(); // → Caderno — R$ 15.9
+
+        System.out.println(Produto.getTotalProdutos()); // → 3
+    }
+}
+```
+
+---
+
 ## 🏗️ Construtores
 
 Um **construtor** é um método especial executado automaticamente no momento em que um objeto é criado com `new`. Seu papel é definir o **estado inicial válido** do objeto.
@@ -724,8 +892,6 @@ A palavra-chave é `abstract`, aplicada tanto à classe quanto aos métodos que 
    └──────────────┘     └──────────────┘
 ```
 
----
-
 ### Declarando uma Classe Abstrata
 
 ```java
@@ -748,8 +914,6 @@ public abstract class Forma {
 
 > ⚠️ Uma classe que contém **ao menos um método `abstract`** deve obrigatoriamente ser declarada como `abstract`. O inverso não é verdadeiro: uma classe `abstract` pode não ter nenhum método abstrato.
 
----
-
 ### Implementando Subclasses
 
 Toda subclasse **concreta** (não-abstrata) que herda de uma classe abstrata é obrigada a implementar **todos** os métodos abstratos. Caso contrário, ela também deverá ser declarada `abstract`.
@@ -759,13 +923,13 @@ public class Circulo extends Forma {
     private double raio;
 
     public Circulo(String cor, double raio) {
-        super(cor);          // inicializa o atributo da superclasse
+        super(cor);
         this.raio = raio;
     }
 
     @Override
     public double calcularArea() {
-        return Math.PI * raio * raio;   // implementação obrigatória
+        return Math.PI * raio * raio;
     }
 }
 
@@ -781,12 +945,10 @@ public class Retangulo extends Forma {
 
     @Override
     public double calcularArea() {
-        return largura * altura;        // implementação obrigatória
+        return largura * altura;
     }
 }
 ```
-
----
 
 ### Por que não é possível instanciar uma classe abstrata?
 
@@ -795,8 +957,6 @@ Forma f = new Forma("Azul"); // ERRO de compilação: Forma is abstract; cannot 
 ```
 
 A classe abstrata existe para ser **generalização**, não para gerar objetos. Ela modela o conceito, não a entidade concreta. Um `Circulo` existe; uma `Forma` genérica, sem especificação, não faz sentido como objeto real.
-
----
 
 ### Polimorfismo com Classes Abstratas
 
@@ -818,8 +978,6 @@ public class Main {
 
 > 💡 Essa capacidade de referenciar subclasses via tipo abstrato é o fundamento do **baixo acoplamento** — o código que usa `Forma` não precisa saber se está lidando com um `Circulo` ou `Retangulo`.
 
----
-
 ### Método Abstrato vs. Método Concreto
 
 | Característica | Método Abstrato | Método Concreto |
@@ -840,10 +998,6 @@ public void exibirInfo() {
 }
 ```
 
-> 💡 Note que o método concreto `exibirInfo()` chama `calcularArea()`, que é abstrato. Isso é válido — a superclasse confia que toda subclasse terá aquela implementação disponível em tempo de execução.
-
----
-
 ### Cadeia Abstrata: Subclasse também Abstrata
 
 Se uma subclasse não implementar todos os métodos abstratos herdados, ela deve ser declarada `abstract` também. A obrigação se propaga pela cadeia até a primeira classe concreta.
@@ -857,8 +1011,7 @@ public abstract class Poligono extends Forma {
         this.lados = lados;
     }
 
-    // Não implementa calcularArea() → continua sendo abstract
-    public abstract double calcularPerimetro(); // adiciona novo contrato
+    public abstract double calcularPerimetro();
 }
 
 public class Quadrado extends Poligono {
@@ -870,18 +1023,16 @@ public class Quadrado extends Poligono {
     }
 
     @Override
-    public double calcularArea() {          // herdado de Forma
+    public double calcularArea() {
         return lado * lado;
     }
 
     @Override
-    public double calcularPerimetro() {     // herdado de Poligono
+    public double calcularPerimetro() {
         return 4 * lado;
     }
 }
 ```
-
----
 
 ### Classe Abstrata vs. Interface — Quando usar cada uma
 
@@ -917,8 +1068,6 @@ public class CarroEletrico extends Veiculo implements Recarregavel {
 }
 ```
 
----
-
 ### Exemplo Completo: Sistema de Funcionários
 
 ```java
@@ -932,10 +1081,8 @@ public abstract class Funcionario {
         this.salarioBase = salarioBase;
     }
 
-    // Contrato: cada tipo de funcionário calcula o bônus à sua maneira
     public abstract double calcularBonus();
 
-    // Método concreto reutilizável por todas as subclasses
     public void exibirContracheque() {
         System.out.println("Funcionário : " + nome);
         System.out.println("Salário Base: R$ " + salarioBase);
@@ -955,7 +1102,7 @@ public class Vendedor extends Funcionario {
 
     @Override
     public double calcularBonus() {
-        return totalVendas * 0.10; // 10% sobre vendas
+        return totalVendas * 0.10;
     }
 }
 
@@ -967,7 +1114,7 @@ public class Diretor extends Funcionario {
 
     @Override
     public double calcularBonus() {
-        return salarioBase * 0.50; // 50% fixo sobre o salário
+        return salarioBase * 0.50;
     }
 }
 
@@ -996,8 +1143,6 @@ Salário Base: R$ 8000.0
 Bônus       : R$ 4000.0
 Total       : R$ 12000.0
 ```
-
----
 
 ### Síntese: Quando usar Classe Abstrata?
 
@@ -1061,12 +1206,8 @@ String texto = null;
 int tamanho = texto.length(); // Dispara NullPointerException
 ```
 
-Quando ocorre: invocar métodos em variável nula, acessar atributo de objeto nulo, acessar índice em array não inicializado.
-
 #### `IndexOutOfBoundsException`
 Indica que um índice de alguma estrutura ordenável (Array, String, List) está fora dos limites válidos.
-
-Gatilhos: acesso a posições negativas, acesso a índices maiores ou iguais ao tamanho real, falha na condição de parada de laços `for`/`while`.
 
 #### `ArithmeticException`
 Lançada quando ocorre uma condição matemática impossível durante o processamento.
@@ -1078,7 +1219,7 @@ System.out.println(a / b); // Lança ArithmeticException: / by zero
 ```
 
 #### `IllegalArgumentException`
-Exceção lançada proativamente para indicar que um método recebeu um argumento com valor inapropriado ou logicamente inválido. Padrão **Fail-Fast** — interrompe a execução antes de processar dados corrompidos.
+Exceção lançada proativamente para indicar que um método recebeu um argumento com valor inapropriado. Padrão **Fail-Fast**.
 
 ```java
 throw new IllegalArgumentException("Idade inválida");
@@ -1087,23 +1228,15 @@ throw new IllegalArgumentException("Idade inválida");
 #### `IllegalStateException`
 Sinaliza que um método foi invocado num momento ilegal — o objeto não está no estado correto para processar a operação.
 
-Quando utilizar: tentar iniciar uma `Thread` que já está rodando, iterar sobre uma coleção já fechada, proteger regras de negócio que dependem de sequência de eventos (Estado A → B → C).
-
 ### Exceções Checked (Contingências Externas)
 
 #### `IOException`
-Sinaliza falha ou interrupção nas operações de Entrada/Saída. O erro reside no ambiente externo, não na lógica do programa. **Exige** bloco `try-catch` ou declaração `throws`.
-
-Gatilhos: leitura de arquivo inexistente (`FileNotFoundException`), falha em fluxos de rede (sockets), interrupção em permissões de disco.
+Sinaliza falha ou interrupção nas operações de Entrada/Saída. **Exige** bloco `try-catch` ou declaração `throws`.
 
 #### `SQLException`
 Lançada para erros no acesso a banco de dados ou problemas correlatos a transações relacionais.
 
-Gatilhos: perda de conexão com o SGBD, sintaxe SQL malformada, violação de restrições relacionais (chave estrangeira, chave primária duplicada).
-
 ### Exceções Customizadas
-
-É possível criar classes próprias para mapear regras de negócio específicas, aumentando a legibilidade do sistema:
 
 ```java
 // Caminho Checked — força o chamador a tratar
@@ -1117,16 +1250,6 @@ class SaldoInsuficienteException extends Exception {
 class IdadeInvalidaException extends RuntimeException {
     public IdadeInvalidaException(String mensagem) {
         super(mensagem);
-    }
-}
-```
-
-Para usar: instanciar e disparar com `throw new`:
-
-```java
-public void sacar(double valor) {
-    if (valor > this.saldo) {
-        throw new SaldoInsuficienteException("Saldo inferior ao saque requisitado.");
     }
 }
 ```
@@ -1150,36 +1273,19 @@ public void sacar(double valor) {
 
 O tratamento de exceções é uma **infraestrutura arquitetural** projetada para separar a lógica de negócio da lógica de recuperação de falhas, garantindo a integridade do estado da aplicação diante de anomalias.
 
-### A Árvore Taxonômica de Throwable
-
-```
-Throwable  ← O topo da hierarquia
-├── Error          ← Falhas irrecuperáveis (OutOfMemoryError, StackOverflowError)
-└── Exception      ← Contingências recuperáveis
-    └── RuntimeException  ← Falhas de programação (Unchecked)
-```
-
-> ⚠️ Instâncias de `Error` representam falhas críticas no nível da JVM. A aplicação **não deve** tentar capturá-las (`catch`), pois a recuperação do estado é tecnicamente inviável.
-
 ### O Fluxo try-catch
-
-O bloco `try` delimita o escopo monitorado. Se uma falha ocorre, a execução daquele escopo é abortada instantaneamente. A JVM busca o primeiro bloco `catch` cujo parâmetro corresponda (ou seja superclasse) do objeto de exceção gerado. O modelo do Java é de **terminação** — não retorna ao ponto original da falha.
 
 ```java
 try {
-    // código que pode lançar exceção
     int resultado = 10 / 0;
 } catch (ArithmeticException e) {
-    // tratamento da exceção capturada
     System.out.println("Erro: " + e.getMessage());
 }
 ```
 
 ### O bloco `finally`
 
-A cláusula `finally` garante uma finalização **determinística**. Independentemente de o `try` concluir com sucesso, de uma exceção ser capturada pelo `catch`, ou até de um `catch` lançar uma nova exceção, o fluxo **obrigatoriamente** passará pelo `finally` antes de prosseguir.
-
-Primordialmente utilizado para limpeza e liberação de recursos (fechamento de conexões, arquivos e sockets).
+Executado **sempre**, independentemente de sucesso ou falha. Usado para liberar recursos.
 
 ```java
 try {
@@ -1196,7 +1302,7 @@ try {
 
 | | `throw` | `throws` |
 |---|---------|---------|
-| **O quê** | A execução da falha — sinaliza explicitamente uma condição anômala | O aviso de risco — declara as exceções que um método pode disparar |
+| **O quê** | Executa a falha — sinaliza condição anômala | Declara as exceções que o método pode disparar |
 | **Escopo** | Dentro do corpo do método | Na assinatura do método |
 
 ```java
@@ -1209,77 +1315,27 @@ public void lerArquivo() throws IOException {
 }
 ```
 
-### Desempilhamento e Delegação (Stack Unwinding)
-
-Quando uma exceção não é capturada no escopo em que ocorre, o Java realiza o **desempilhamento** (stack unwinding): o método atual é encerrado, suas variáveis locais são destruídas, e a exceção é passada para o método chamador. A delegação continua até encontrar um bloco `catch` compatível ou até derrubar a Thread principal.
-
-```
-Main → Method A → Method B
-                    ↑ IOException lançada aqui
-               ← Exception propagada de volta →
-Main (captura aqui ou programa termina)
-```
-
 ### Gestão de Recursos: try-with-resources (Java 7+)
 
-A estrutura `try-with-resources` automatiza o fechamento determinístico de recursos. Qualquer objeto que implemente `java.lang.AutoCloseable` (ou `Closeable`) terá seu `.close()` invocado automaticamente pela JVM ao final do escopo, eliminando a necessidade do `finally` manual.
-
 ```java
-// ❌ Pré-Java 7 — verboso e arriscado
-try {
-    recurso = abrirRecurso();
-    // lógica
-} catch (Exception e) {
-    // tratamento
-} finally {
-    if (recurso != null) {
-        recurso.close(); // falha aqui pode ocultar exceção original!
-    }
-}
-
 // ✅ Java 7+ — limpo e seguro
 try (Scanner leitor = new Scanner(arquivo)) {
-    // lógica — leitor.close() é chamado automaticamente
+    // leitor.close() é chamado automaticamente ao sair do bloco
 } catch (IOException e) {
     // tratamento
-}
-```
-
-**Vantagens do `try-with-resources`:**
-
-| Dimensão | Clássico (Pré-Java 7) | Moderno (Java 7+) |
-|----------|----------------------|-------------------|
-| Gestão | Manual no `finally` | Automática pela JVM |
-| Ordem de Fechamento | Aleatória (depende do dev) | Inversa à ordem de declaração |
-| Boilerplate | Elevado (aninhamentos nulos) | Mínimo (integrado ao `try`) |
-| Mascaramento de Erros | A última exceção no `finally` sobrepõe o erro original | A falha original é preservada; falhas secundárias são suprimidas |
-
-### Modelagem de Regras de Negócio (Exceções Customizadas)
-
-É uma boa prática mapear falhas de regras de negócio em classes específicas de exceção. Para criar uma exceção customizada, cria-se uma classe que herde de `Exception` (para checked) ou de `RuntimeException` (para unchecked):
-
-```java
-// Checked — força o chamador a tratar
-public class SaldoInsuficienteException extends Exception {
-    public SaldoInsuficienteException() {
-        super();
-    }
-    public SaldoInsuficienteException(String message) {
-        super(message);
-    }
 }
 ```
 
 ### Síntese Arquitetural: O Cenário Ideal
 
 ```java
-public void processarDados() throws OperacaoFalhouException {        // Contrato de Delegação
-    try (Scanner leitor = new Scanner(arquivo)) {                    // Gestão Moderna de Recursos
+public void processarDados() throws OperacaoFalhouException {
+    try (Scanner leitor = new Scanner(arquivo)) {
         if (!valido) {
-            throw new RegraNegocioException();                       // Ação Explícita de Domínio
+            throw new RegraNegocioException();
         }
-    } catch (IOException | SQLException e) {                        // Multi-catch de Contingências
-        throw new OperacaoFalhouException("Falha na leitura", e);   // Encapsulamento (Translation)
+    } catch (IOException | SQLException e) {
+        throw new OperacaoFalhouException("Falha na leitura", e);
     }
 }
 ```
