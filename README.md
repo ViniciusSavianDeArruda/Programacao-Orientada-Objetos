@@ -699,6 +699,322 @@ public class Gerente extends Funcionario {
 
 ---
 
+## 🧩 Classes Abstratas
+
+Uma **classe abstrata** é um molde incompleto — ela define uma estrutura e pode conter comportamentos concretos, mas **não pode ser instanciada diretamente**. Seu propósito é servir como base obrigatória para subclasses, impondo um contrato de implementação.
+
+A palavra-chave é `abstract`, aplicada tanto à classe quanto aos métodos que devem ser obrigatoriamente implementados pelas subclasses.
+
+```
+┌──────────────────────────────────────────────┐
+│           <<abstract>>  Forma               │
+│  ──────────────────────────────────────────  │
+│  # cor : String                             │  ← Atributo herdável
+│  ──────────────────────────────────────────  │
+│  + getCor() : String                        │  ← Método concreto (herdado)
+│  + calcularArea() : double  {abstract}      │  ← Método abstrato (contrato)
+└──────────────────────────────────────────────┘
+                     △
+          ┌──────────┴──────────┐
+          │                     │
+   ┌──────────────┐     ┌──────────────┐
+   │   Circulo    │     │  Retangulo   │
+   │ ──────────── │     │ ──────────── │
+   │ + calcularArea()   │ + calcularArea()
+   └──────────────┘     └──────────────┘
+```
+
+---
+
+### Declarando uma Classe Abstrata
+
+```java
+public abstract class Forma {
+    protected String cor;
+
+    public Forma(String cor) {
+        this.cor = cor;
+    }
+
+    // Método concreto — tem implementação, é herdado normalmente
+    public String getCor() {
+        return this.cor;
+    }
+
+    // Método abstrato — sem corpo; obriga a subclasse a implementar
+    public abstract double calcularArea();
+}
+```
+
+> ⚠️ Uma classe que contém **ao menos um método `abstract`** deve obrigatoriamente ser declarada como `abstract`. O inverso não é verdadeiro: uma classe `abstract` pode não ter nenhum método abstrato.
+
+---
+
+### Implementando Subclasses
+
+Toda subclasse **concreta** (não-abstrata) que herda de uma classe abstrata é obrigada a implementar **todos** os métodos abstratos. Caso contrário, ela também deverá ser declarada `abstract`.
+
+```java
+public class Circulo extends Forma {
+    private double raio;
+
+    public Circulo(String cor, double raio) {
+        super(cor);          // inicializa o atributo da superclasse
+        this.raio = raio;
+    }
+
+    @Override
+    public double calcularArea() {
+        return Math.PI * raio * raio;   // implementação obrigatória
+    }
+}
+
+public class Retangulo extends Forma {
+    private double largura;
+    private double altura;
+
+    public Retangulo(String cor, double largura, double altura) {
+        super(cor);
+        this.largura = largura;
+        this.altura = altura;
+    }
+
+    @Override
+    public double calcularArea() {
+        return largura * altura;        // implementação obrigatória
+    }
+}
+```
+
+---
+
+### Por que não é possível instanciar uma classe abstrata?
+
+```java
+Forma f = new Forma("Azul"); // ERRO de compilação: Forma is abstract; cannot be instantiated
+```
+
+A classe abstrata existe para ser **generalização**, não para gerar objetos. Ela modela o conceito, não a entidade concreta. Um `Circulo` existe; uma `Forma` genérica, sem especificação, não faz sentido como objeto real.
+
+---
+
+### Polimorfismo com Classes Abstratas
+
+A referência do tipo da superclasse abstrata pode apontar para qualquer subclasse concreta. O método executado é sempre o da subclasse real do objeto — isso é **polimorfismo em tempo de execução**.
+
+```java
+public class Main {
+    public static void main(String[] args) {
+
+        Forma f1 = new Circulo("Vermelho", 5.0);
+        Forma f2 = new Retangulo("Azul", 4.0, 6.0);
+
+        System.out.println(f1.getCor());         // → Vermelho
+        System.out.println(f1.calcularArea());   // → 78.53...  (Circulo)
+        System.out.println(f2.calcularArea());   // → 24.0      (Retangulo)
+    }
+}
+```
+
+> 💡 Essa capacidade de referenciar subclasses via tipo abstrato é o fundamento do **baixo acoplamento** — o código que usa `Forma` não precisa saber se está lidando com um `Circulo` ou `Retangulo`.
+
+---
+
+### Método Abstrato vs. Método Concreto
+
+| Característica | Método Abstrato | Método Concreto |
+|----------------|:--------------:|:---------------:|
+| Corpo `{ }` | ❌ Proibido | ✅ Obrigatório |
+| Palavra-chave | `abstract` | — |
+| Herdado como está | ❌ Deve ser sobrescrito | ✅ Pode ser usado diretamente |
+| Pode ser `private` | ❌ Nunca | ✅ Sim |
+| Objetivo | Impor contrato às subclasses | Oferecer comportamento reutilizável |
+
+```java
+// Método abstrato — apenas assinatura
+public abstract double calcularArea();
+
+// Método concreto — tem implementação
+public void exibirInfo() {
+    System.out.println("Cor: " + this.cor + " | Área: " + calcularArea());
+}
+```
+
+> 💡 Note que o método concreto `exibirInfo()` chama `calcularArea()`, que é abstrato. Isso é válido — a superclasse confia que toda subclasse terá aquela implementação disponível em tempo de execução.
+
+---
+
+### Cadeia Abstrata: Subclasse também Abstrata
+
+Se uma subclasse não implementar todos os métodos abstratos herdados, ela deve ser declarada `abstract` também. A obrigação se propaga pela cadeia até a primeira classe concreta.
+
+```java
+public abstract class Poligono extends Forma {
+    protected int lados;
+
+    public Poligono(String cor, int lados) {
+        super(cor);
+        this.lados = lados;
+    }
+
+    // Não implementa calcularArea() → continua sendo abstract
+    public abstract double calcularPerimetro(); // adiciona novo contrato
+}
+
+public class Quadrado extends Poligono {
+    private double lado;
+
+    public Quadrado(String cor, double lado) {
+        super(cor, 4);
+        this.lado = lado;
+    }
+
+    @Override
+    public double calcularArea() {          // herdado de Forma
+        return lado * lado;
+    }
+
+    @Override
+    public double calcularPerimetro() {     // herdado de Poligono
+        return 4 * lado;
+    }
+}
+```
+
+---
+
+### Classe Abstrata vs. Interface — Quando usar cada uma
+
+| Dimensão | Classe Abstrata | Interface |
+|----------|:--------------:|:---------:|
+| Palavra-chave | `abstract class` | `interface` |
+| Herança/Implementação | `extends` (1 única) | `implements` (múltiplas) |
+| Pode ter atributos de instância | ✅ Sim | ❌ Apenas `static final` |
+| Pode ter construtores | ✅ Sim | ❌ Não |
+| Pode ter métodos concretos | ✅ Sim | ✅ Sim (desde Java 8, com `default`) |
+| Relação semântica | **"É um"** — compartilha identidade | **"Pode fazer"** — compartilha capacidade |
+| Uso ideal | Hierarquia com estado e comportamento parcial compartilhado | Contrato de comportamento sem estado |
+
+```java
+// Classe Abstrata — compartilha identidade e estado
+public abstract class Veiculo {
+    protected int velocidadeMaxima;
+    public abstract void mover();
+}
+
+// Interface — define uma capacidade
+public interface Recarregavel {
+    void recarregar();
+}
+
+// Combinando os dois
+public class CarroEletrico extends Veiculo implements Recarregavel {
+    @Override
+    public void mover() { System.out.println("Movendo silenciosamente..."); }
+
+    @Override
+    public void recarregar() { System.out.println("Carregando bateria..."); }
+}
+```
+
+---
+
+### Exemplo Completo: Sistema de Funcionários
+
+```java
+// Superclasse abstrata
+public abstract class Funcionario {
+    protected String nome;
+    protected double salarioBase;
+
+    public Funcionario(String nome, double salarioBase) {
+        this.nome = nome;
+        this.salarioBase = salarioBase;
+    }
+
+    // Contrato: cada tipo de funcionário calcula o bônus à sua maneira
+    public abstract double calcularBonus();
+
+    // Método concreto reutilizável por todas as subclasses
+    public void exibirContracheque() {
+        System.out.println("Funcionário : " + nome);
+        System.out.println("Salário Base: R$ " + salarioBase);
+        System.out.println("Bônus       : R$ " + calcularBonus());
+        System.out.println("Total       : R$ " + (salarioBase + calcularBonus()));
+    }
+}
+
+// Subclasse concreta 1
+public class Vendedor extends Funcionario {
+    private double totalVendas;
+
+    public Vendedor(String nome, double salarioBase, double totalVendas) {
+        super(nome, salarioBase);
+        this.totalVendas = totalVendas;
+    }
+
+    @Override
+    public double calcularBonus() {
+        return totalVendas * 0.10; // 10% sobre vendas
+    }
+}
+
+// Subclasse concreta 2
+public class Diretor extends Funcionario {
+    public Diretor(String nome, double salarioBase) {
+        super(nome, salarioBase);
+    }
+
+    @Override
+    public double calcularBonus() {
+        return salarioBase * 0.50; // 50% fixo sobre o salário
+    }
+}
+
+// Programa principal
+public class Main {
+    public static void main(String[] args) {
+        Funcionario f1 = new Vendedor("Ana", 2000.0, 15000.0);
+        Funcionario f2 = new Diretor("Carlos", 8000.0);
+
+        f1.exibirContracheque();
+        System.out.println("---");
+        f2.exibirContracheque();
+    }
+}
+```
+
+**Saída:**
+```
+Funcionário : Ana
+Salário Base: R$ 2000.0
+Bônus       : R$ 1500.0
+Total       : R$ 3500.0
+---
+Funcionário : Carlos
+Salário Base: R$ 8000.0
+Bônus       : R$ 4000.0
+Total       : R$ 12000.0
+```
+
+---
+
+### Síntese: Quando usar Classe Abstrata?
+
+Use `abstract class` quando:
+
+**Hierarquia com identidade compartilhada** — as subclasses representam variações de um mesmo conceito (`Forma → Circulo`, `Funcionario → Gerente`).
+
+**Estado comum** — os objetos derivados compartilham atributos que fazem sentido centralizar na superclasse (`nome`, `salarioBase`, `cor`).
+
+**Comportamento parcialmente definido** — existe lógica comum reutilizável (métodos concretos) e lógica que cada subclasse deve especializar (métodos abstratos).
+
+**Impedir instância direta** — quando criar um objeto do tipo genérico não faz sentido semântico no domínio do problema.
+
+> 💡 **Regra prática:** se você se pegar duplicando atributos e métodos em várias classes relacionadas, provavelmente há uma classe abstrata esperando para ser criada.
+
+---
+
 ## ⚠️ Principais Exceções em Java
 
 Em Java, uma **exceção** é um evento anômalo que interrompe o fluxo normal de execução. O sistema de exceções é uma infraestrutura arquitetural — não apenas uma convenção sintática — projetada para separar a lógica de negócio da lógica de recuperação de falhas.
