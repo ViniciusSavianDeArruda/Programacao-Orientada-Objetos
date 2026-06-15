@@ -1,83 +1,111 @@
-package aula02;
+package pkg;
 
 import java.util.Scanner;
 
-public class pricipal {
+/*
+ * Revisando fundamentos de Java:
+ * - Tipos de dados (int, char, float, double, boolean, String)
+ * - Operadores
+ * - Estruturas de controle (if, switch)
+ * - Entrada de dados com Scanner
+ * - Constantes com final
+ */
 
-    public static void main(String[] args) {
+public class Principal {
 
-        Scanner teclado = new Scanner(System.in);
-        
-        // Leitura de inteiro
-        int numero;
-        System.out.println("Digite um numero inteiro:");
-        numero = teclado.nextInt();
-        System.out.println("Inteiro digitado: " + numero);
+	public static void main(String[] args) {
 
-        // Leitura de double
-        double numeroDecimal;
-        System.out.println("Digite um numero decimal:");
-        numeroDecimal = teclado.nextDouble();
-        System.out.println("Double digitado: " + numeroDecimal);
+		// Criando objeto Scanner para ler dados do teclado
+		Scanner teclado = new Scanner(System.in);
 
-        // Limpar buffer do teclado
-        teclado.nextLine();
+		// Exibindo mensagem simples
+		System.out.println("Ola Mundo");
 
-        // Leitura de String (linha completa)
-        String palavra;
-        System.out.println("Digite uma frase:");
-        palavra = teclado.nextLine();
-        System.out.println("String digitada: " + palavra);
+		// Declarando e inicializando variável inteira
+		int idade = 18;
+		System.out.printf("Idade é: %d\n", idade);
+		System.out.println("Minha idade é: " + idade);
 
-      
-         //Usado quando sabemos o número de repetições
-        for (int i = 0; i < 10; i++) {
+		// Declarando variável char e outra int
+		char letra = 'r';
+		int anos = 1975;
 
-            if (i == 7) {
-                break; // Interrompe o laço
-            }
+		System.out.println("A letra é: " + letra);
+		System.out.println("A idade é: " + anos);
 
-            if (i == 5) {
-                continue; // Pula para a próxima repetição
-            }
+		// Declarando float e double
+		float precoFloat = 3.57f; // float precisa da letra 'f'
+		double precoDouble = 4.33;
 
-            System.out.println("Valor de i (for): " + i);
-        }
+		System.out.println("O preço em float: " + precoFloat);
+		System.out.println("O preço em double: " + precoDouble);
 
-         //Usado quando NÃO sabemos exatamente quantas vezes o laço irá repetir
-        int i = 0;
-        while (i < 5) {
-            System.out.println("Valor de i (while): " + i);
-            i++;
-        }
+		// Declarando constante
+		final double PI = 3.1415;
+		System.out.println("O valor de pi é: " + PI);
 
+		// Entrada de nome (String)
+		System.out.println("Digite seu nome:");
+		String nome = teclado.nextLine();
+		System.out.println("Nome digitado: " + nome);
 
-       //Executa pelo menos UMA vez, mesmo que a condição seja falsa
-        int j = 0;
-        do {
-            System.out.println("Valor de j (do-while): " + j);
-            j++;
-        } while (j < 5);
+		// Entrada de idade com estrutura condicional
+		System.out.println("Digite sua idade:");
+		int idadeUsuario = teclado.nextInt();
+		System.out.println("Idade digitada é: " + idadeUsuario);
 
+		if (idadeUsuario >= 18) {
+			System.out.println("Você é maior de idade.");
+		} else {
+			System.out.println("Você é menor de idade.");
+		}
 
-        teclado.close();
-    }
+		// Menu usando switch-case
+		System.out.println("Digite uma opção:");
+		System.out.println("1 - Para cadastrar");
+		System.out.println("2 - Para editar");
+		System.out.println("3 - Para excluir");
+		System.out.println("0 - Para sair");
+
+		int opcao = teclado.nextInt();
+
+		switch (opcao) {
+		case 1:
+			System.out.println("Opção de cadastro selecionada.");
+			break;
+
+		case 2:
+			System.out.println("Opção de edição selecionada.");
+			break;
+
+		case 3:
+			System.out.println("Opção de exclusão selecionada.");
+			break;
+
+		case 0:
+			System.out.println("Saindo do programa.");
+			break;
+
+		default:
+			System.out.println("Opção inválida.");
+		}
+
+		// Entrada de float
+		System.out.println("Digite o preço do produto:");
+		float precoProduto = teclado.nextFloat();
+		System.out.println("O preço do produto é: " + precoProduto);
+
+		// Entrada de double
+		System.out.println("Digite um número:");
+		double numero = teclado.nextDouble();
+		System.out.println("O número digitado é: " + numero);
+
+		// Entrada de caractere
+		System.out.println("Digite um caractere:");
+		char c = teclado.next().charAt(0);
+		System.out.println("O caractere digitado é: " + c);
+
+		// Fechando o Scanner
+		teclado.close();
+	}
 }
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

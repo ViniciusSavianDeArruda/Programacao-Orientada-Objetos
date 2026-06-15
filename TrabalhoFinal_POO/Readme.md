@@ -54,7 +54,7 @@ public Aluno(String nome, String cpf, int idade, Plano plano)
 ```
 
 ### 3. Encapsulamento
-Todos os atributos das classes do pacote [`models`](src/models) são `private` e o acesso é feito por meio de **getters/setters validados**, impedindo que o estado dos objetos seja modificado de forma indevida. As validações incluem: CPF com 11 dígitos numéricos, nome obrigatório, especialidade obrigatória e idade entre **14 e 120 anos**.
+Todos os atributos das classes do pacote [`models`](src/models) são `private` e o acesso é feito por meio de **getters/setters validados**, impedindo que o estado dos objetos seja modificado de forma indevida. As validações incluem: CPF com 11 dígitos numéricos, nome obrigatório, especialidade obrigatória e idade entre **16 e 80 anos**.
 
 ### 4. Herança
 Foram criadas duas hierarquias, ambas respeitando a relação **"É UM"**:
